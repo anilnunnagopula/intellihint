@@ -1,0 +1,54 @@
+.planet {
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, #2d9cdb, #0f4c75);
+    border-radius: 50%;
+    box-shadow: 0 0 60px rgba(45, 156, 219, 0.6);
+    z-index: 5;
+    animation: spin 20s linear infinite;
+    position: relative;
+  }
+  
+  .satellite-orbit {
+    width: 250px;
+    height: 250px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    position: absolute;
+    animation: orbit 10s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+  
+  .satellite {
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px white;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes orbit {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+  
