@@ -1,54 +1,102 @@
+/* client/src/components/PlanetScene.css */
+
+/* Starry background */
+.star-background {
+  background: #0a0a2a; /* Dark blue background */
+  overflow: hidden; /* Ensure stars don't overflow */
+  position: relative; /* Needed for ::before pseudo-element positioning */
+}
+
+/* Pseudo-element for generating stars */
+.star-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Multiple radial gradients create the star effect */
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 80px 70px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 150px 10px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 100px 150px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 200px 50px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 250px 120px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 300px 20px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 350px 90px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 400px 180px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 450px 70px, #eee, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 400px 400px; /* Adjust size for more/fewer stars */
+  animation: twinkle 100s linear infinite; /* Animation for star movement */
+}
+
+/* Keyframes for star movement */
+@keyframes twinkle {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -10000px 5000px; /* Adjust values for speed and direction */
+  }
+}
+
+/* Planet styling */
 .planet {
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle, #2d9cdb, #0f4c75);
-    border-radius: 50%;
-    box-shadow: 0 0 60px rgba(45, 156, 219, 0.6);
-    z-index: 5;
-    animation: spin 20s linear infinite;
-    position: relative;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, #2d9cdb, #0f4c75); /* Gradient for planet effect */
+  border-radius: 50%; /* Make it circular */
+  box-shadow: 0 0 60px rgba(45, 156, 219, 0.6); /* Glow effect */
+  z-index: 5; /* Ensure it's above other elements */
+  animation: spin 20s linear infinite; /* Spin animation */
+  position: relative; /* For z-index and potential inner elements */
+}
+
+/* Satellite orbit styling */
+.satellite-orbit {
+  width: 250px;
+  height: 250px;
+  border: 1px dashed rgba(255, 255, 255, 0.1); /* Dashed orbit line */
+  border-radius: 50%; /* Circular orbit */
+  position: absolute;
+  animation: orbit 10s linear infinite; /* Orbit animation */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the orbit */
+  z-index: 1; /* Ensure it's behind the planet but above background */
+}
+
+/* Satellite styling */
+.satellite {
+  width: 10px;
+  height: 10px;
+  background: white; /* White satellite */
+  border-radius: 50%; /* Circular satellite */
+  position: absolute;
+  top: 0; /* Position at the top of the orbit path */
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the satellite on its starting point */
+  box-shadow: 0 0 8px white; /* Glow effect */
+}
+
+/* Keyframes for planet spin */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
-  
-  .satellite-orbit {
-    width: 250px;
-    height: 250px;
-    border: 1px dashed rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    position: absolute;
-    animation: orbit 10s linear infinite;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
+  100% {
+    transform: rotate(360deg);
   }
-  
-  .satellite {
-    width: 10px;
-    height: 10px;
-    background: white;
-    border-radius: 50%;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 8px white;
+}
+
+/* Keyframes for satellite orbit */
+@keyframes orbit {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
   }
-  
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
-  
-  @keyframes orbit {
-    0% {
-      transform: translate(-50%, -50%) rotate(0deg);
-    }
-    100% {
-      transform: translate(-50%, -50%) rotate(360deg);
-    }
-  }
-  
+}

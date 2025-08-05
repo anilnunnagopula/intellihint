@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const AuthContext = createContext();
 
@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [user, setUser] = useState(localStorage.getItem("user") || null);
   const navigate = useNavigate();
-  const location = useLocation(); // Get current location
+  const location = useLocation();
 
   const login = (newToken, username) => {
     localStorage.setItem("token", newToken);
@@ -24,17 +24,17 @@ export const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
-  // Auto-redirect to login if no token on protected routes
+  // Auto-redirect logic
   useEffect(() => {
-    // Only redirect if there's no token AND the current path is NOT /login or /register
-    if (
-      !token &&
-      location.pathname !== "/login" &&
-      location.pathname !== "/register"
-    ) {
+    // Define paths that do NOT require authentication
+    const publicPaths = ["/login", "/register", "/"];
+
+    // If there's no token AND the current path is NOT one of the public paths,
+    // then redirect to login.
+    if (!token && !publicPaths.includes(location.pathname)) {
       navigate("/login");
     }
-  }, [token, navigate, location.pathname]); // Add location.pathname to dependencies
+  }, [token, navigate, location.pathname]);
 
   return (
     <AuthContext.Provider value={{ token, user, login, logout }}>
