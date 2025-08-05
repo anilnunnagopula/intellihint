@@ -1,10 +1,11 @@
 import React, { useState, useContext } from "react";
 import toast from "react-hot-toast";
-import { useNavigate, Link } from "react-router-dom"; // Ensure Link is imported
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import api from "../utils/api";
 
-function LoginPage() {
+function RegisterPage() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,9 +17,13 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await api.post("/auth/login", { email, password });
+      const res = await api.post("/auth/register", {
+        username,
+        email,
+        password,
+      });
       login(res.data.token, res.data.username);
-      toast.success("Login successful! Redirecting...");
+      toast.success("Registration successful! Redirecting...");
       navigate("/"); // Navigate to home/dashboard after login
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong.");
@@ -27,28 +32,45 @@ function LoginPage() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // This is a placeholder for Google Sign-In.
+  const handleGoogleSignUp = () => {
+    // This is a placeholder for Google Sign-Up.
     // In a real application, you would initiate Google OAuth flow here.
-    toast("Google Sign-In initiated (placeholder)!", { icon: "🚀" });
-    console.log("Initiating Google Sign-In...");
+    toast("Google Sign-Up initiated (placeholder)!", { icon: "🚀" });
+    console.log("Initiating Google Sign-Up...");
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900">
       <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-xl shadow-lg">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
-          <p className="mt-2 text-sm text-gray-400">Sign in to continue</p>
+          <h1 className="text-3xl font-bold text-white">Create an Account</h1>
+          <p className="mt-2 text-sm text-gray-400">
+            Start your IntelliHint journey
+          </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
+              Username
+            </label>
+            <input
+              type="text"
+              id="username" // Added id
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500"
+              placeholder="Enter your username"
+            />
+          </div>
           <div>
             <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-300 mb-1"
             >
-              {" "}
-              {/* Added htmlFor */}
               Email
             </label>
             <input
@@ -66,8 +88,6 @@ function LoginPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-300 mb-1"
             >
-              {" "}
-              {/* Added htmlFor */}
               Password
             </label>
             <input
@@ -89,7 +109,7 @@ function LoginPage() {
                 : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}
           >
-            Login
+            Register
           </button>
         </form>
 
@@ -100,7 +120,7 @@ function LoginPage() {
         </div>
 
         <button
-          onClick={handleGoogleSignIn}
+          onClick={handleGoogleSignUp}
           disabled={loading}
           className={`w-full flex items-center justify-center py-2 px-4 font-bold rounded-md transition-colors border border-gray-600 ${
             loading
@@ -113,13 +133,13 @@ function LoginPage() {
             alt="Google logo"
             className="w-5 h-5 mr-2"
           />
-          Sign in with Google
+          Sign up with Google
         </button>
 
         <div className="text-center text-sm text-gray-400 mt-4">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-blue-400 hover:underline">
-            Register now
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-400 hover:underline">
+            Login here
           </Link>
         </div>
       </div>
@@ -127,4 +147,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;

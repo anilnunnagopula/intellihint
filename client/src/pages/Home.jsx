@@ -1,10 +1,10 @@
 import React, { useState, useContext } from "react";
 import CodeMirror from "@uiw/react-codemirror";
-// Import Java language extension for CodeMirror
 import { java } from "@codemirror/lang-java";
 import { PromptContext } from "../context/PromptContext";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import Navbar from "../components/Navbar"; // Import the Navbar component
 
 // Component to render the complexity graph inline
 const ComplexityVisualization = ({ complexity, title }) => {
@@ -118,142 +118,119 @@ function Home() {
     setProblem(userInput); // Save the problem to context
     setUserInput(""); // Clear the input box
 
-    // Simulate API call to your Node.js backend
     try {
-      // We will now use a mock response that is returned all at once,
-      // but displayed step-by-step by the frontend.
-      const mockResponse = {
-        problemBreakdown:
-          "The problem asks you to find two numbers in an array that add up to a specific target value, and return their indices.",
-        pattern: "Hash Map (or Two Pointers)",
-        difficulty: "Easy",
-        hints: [
-          "Hint 1: A brute-force approach would involve nested loops. What is the time complexity of that solution?",
-          "Hint 2: Can you optimize the search for the second number? Think about using a data structure that provides fast lookups.",
-          'Hint 3: For each number, calculate its "complement" (target - current number) and check if you have seen this complement before. A hash map is perfect for this.',
-        ],
-        solutions: {
-          bruteForce: {
-            title: "Brute Force Solution",
-            approach:
-              "Iterate through the array with two nested loops. The outer loop selects the first number, and the inner loop checks the rest of the numbers to find a pair that sums to the target.",
-            intuition:
-              "The simplest way to find a pair is to check every possible combination of numbers. We can do this by picking one number and then, for each one, checking all the subsequent numbers to see if they form the desired sum.",
-            complexityAnalysis: {
-              time: "O(n²)",
-              space: "O(1)",
-              graph:
-                "The time complexity is quadratic because for each element, we are iterating through the rest of the array. As the input size (n) increases, the time required grows exponentially.",
-            },
-            code: `class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        for (int i = 0; i < nums.length; i++) {
-            for (int j = i + 1; j < nums.length; j++) {
-                if (nums[i] + nums[j] == target) {
-                    return new int[]{i, j};
-                }
-            }
-        }
-        // No solution found (though problem usually guarantees one)
-        return new int[]{}; 
-    }
-}
-`,
-          },
-          better: {
-            // New "Better" approach
-            title: "Better Approach: Two-Pass Hash Map",
-            approach:
-              "In the first pass, store each number and its index in a hash map. In the second pass, for each number, calculate its complement and check if the complement exists in the hash map. Ensure the complement is not the number itself if it's the same index.",
-            intuition:
-              "We can reduce the search time for the complement by storing all numbers in a hash map first. This allows us to look up complements in nearly constant time. The two passes separate the population and lookup phases.",
-            complexityAnalysis: {
-              time: "O(n)",
-              space: "O(n)",
-              graph:
-                "The time complexity is linear because we iterate through the array twice. The space complexity is also linear, as we store up to n elements in the hash map.",
-            },
-            code: `import java.util.HashMap;
-import java.util.Map;
+      // Construct the prompt for the AI model
+      const aiPrompt = `
+        Analyze the following coding problem and provide a structured response in JSON format.
+        The response should include:
+        1.  **problemBreakdown**: A brief paraphrase of the question in simple terms.
+        2.  **pattern**: What kind of problem this is (e.g., Binary Search, DP, Sliding Window, Hash Map, Two Pointers, etc.).
+        3.  **difficulty**: The estimated difficulty level (Easy, Medium, Hard).
+        4.  **hints**: An array of 3 progressive hints.
+        5.  **solutions**: An object containing 'bruteForce', 'better', and 'optimal' solutions. Each solution object should have:
+            * **title**: Title of the approach (e.g., "Brute Force Solution")
+            * **approach**: A brief explanation of the approach.
+            * **intuition**: The core idea or thought process behind the approach.
+            * **complexityAnalysis**: An object with 'time', 'space' (e.g., "O(n)", "O(n²)"), and 'graph' (a brief description for the graph visualization).
+            * **code**: The complete code snippet in Java.
 
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> numMap = new HashMap<>();
-        // First pass: Populate the hash map
-        for (int i = 0; i < nums.length; i++) {
-            numMap.put(nums[i], i);
-        }
+        Problem: "${userInput}"
 
-        // Second pass: Find the complement
-        for (int i = 0; i < nums.length; i++) {
-            int complement = target - nums[i];
-            if (numMap.containsKey(complement) && numMap.get(complement) != i) {
-                return new int[]{i, numMap.get(complement)};
-            }
-        }
-        // No solution found
-        return new int[]{};
-    }
-}
-`,
-          },
-          optimal: {
-            title: "Optimal Solution: Single-Pass Hash Map",
-            approach:
-              'Iterate through the array once. For each number, calculate its "complement" (target - current number). Check if this complement already exists in the hash map. If it does, return the indices. Otherwise, add the current number and its index to the hash map.',
-            intuition:
-              "By combining the population and lookup into a single pass, we can find the solution more efficiently. If we encounter a number whose complement we've already seen, we have our pair. If not, we store the current number for future lookups.",
-            complexityAnalysis: {
-              time: "O(n)",
-              space: "O(n)",
-              graph:
-                "The time complexity is linear because we only make a single pass through the array. The space complexity is also linear, as we store up to n elements in the hash map in the worst case.",
+        Ensure the JSON is perfectly parsable.
+        Example JSON Structure:
+        {
+          "problemBreakdown": "...",
+          "pattern": "...",
+          "difficulty": "...",
+          "hints": ["...", "...", "..."],
+          "solutions": {
+            "bruteForce": {
+              "title": "...",
+              "approach": "...",
+              "intuition": "...",
+              "complexityAnalysis": {
+                "time": "...",
+                "space": "...",
+                "graph": "..."
+              },
+              "code": "..."
             },
-            code: `import java.util.HashMap;
-import java.util.Map;
-
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> numMap = new HashMap<>();
-        for (int i = 0; i < nums.length; i++) {
-            int complement = target - nums[i];
-            if (numMap.containsKey(complement)) {
-                return new int[]{numMap.get(complement), i};
+            "better": {
+              "title": "...",
+              "approach": "...",
+              "intuition": "...",
+              "complexityAnalysis": {
+                "time": "...",
+                "space": "...",
+                "graph": "..."
+              },
+              "code": "..."
+            },
+            "optimal": {
+              "title": "...",
+              "approach": "...",
+              "intuition": "...",
+              "complexityAnalysis": {
+                "time": "...",
+                "space": "...",
+                "graph": "..."
+              },
+              "code": "..."
             }
-            numMap.put(nums[i], i);
+          }
         }
-        // No solution found
-        return new int[]{};
-    }
-}
-`,
+      `;
+
+      // Call your Node.js backend API to analyze the problem
+      // The backend will then call the Gemini API
+      const response = await fetch(
+        "http://localhost:5000/api/ai/analyze-problem",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Add Authorization header if your API requires it (e.g., JWT token)
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        },
-      };
+          body: JSON.stringify({ prompt: aiPrompt, problem: userInput }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Assuming the backend returns the structured data directly
+      const aiParsedResponse = data; // Your backend will return this structure
 
       // Store the full response in context to be rendered progressively
       setResponseSteps([
         {
           type: "breakdown",
-          content: `Hey! Let’s break this down together 😊\n\n**Problem Understanding:** ${mockResponse.problemBreakdown}`,
+          content: `Hey! Let’s break this down together 😊\n\n**Problem Understanding:** ${aiParsedResponse.problemBreakdown}`,
         },
         {
           type: "pattern",
-          content: `**Pattern Recognition:** This looks like a classic **${mockResponse.pattern}** problem.\n**Difficulty Analysis:** I'd rate this as **${mockResponse.difficulty}**.`,
+          content: `**Pattern Recognition:** This looks like a classic **${aiParsedResponse.pattern}** problem.\n**Difficulty Analysis:** I'd rate this as **${aiParsedResponse.difficulty}**.`,
         },
         {
           type: "hint",
-          content: `**Step-by-Step Hints:**\n\n${mockResponse.hints[0]}`,
+          content: `**Step-by-Step Hints:**\n\n${aiParsedResponse.hints[0]}`,
         },
-        { type: "hint", content: mockResponse.hints[1] },
-        { type: "hint", content: mockResponse.hints[2] },
-        { type: "solution", content: mockResponse.solutions.bruteForce },
-        { type: "solution", content: mockResponse.solutions.better }, // Added better approach
-        { type: "solution", content: mockResponse.solutions.optimal },
+        { type: "hint", content: aiParsedResponse.hints[1] },
+        { type: "hint", content: aiParsedResponse.hints[2] },
+        { type: "solution", content: aiParsedResponse.solutions.bruteForce },
+        { type: "solution", content: aiParsedResponse.solutions.better },
+        { type: "solution", content: aiParsedResponse.solutions.optimal },
       ]);
       setStepIndex(0); // Reset to the first step
     } catch (err) {
-      toast.error("Failed to analyze problem. Please try again.");
+      console.error("Error fetching AI response:", err);
+      toast.error(
+        "Failed to analyze problem. Please ensure your backend and AI service are running and you are logged in."
+      );
     } finally {
       setLoading(false);
     }
@@ -300,7 +277,7 @@ class Solution {
             value={step.content.code}
             height="auto"
             theme="dark"
-            extensions={[java()]} // Changed to Java language
+            extensions={[java()]}
             // readOnly is removed to allow copying
           />
           {/* New: Graphical representation below the code */}
@@ -357,8 +334,11 @@ class Solution {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-200 flex flex-col p-4">
-      <div className="flex-1 w-full max-w-3xl mx-auto overflow-y-auto pb-20">
+    <div className="min-h-screen bg-gray-900 text-gray-200 flex flex-col">
+      <Navbar /> {/* Add the Navbar component here */}
+      <div className="flex-1 w-full max-w-3xl mx-auto overflow-y-auto pb-20 pt-16">
+        {" "}
+        {/* Add pt-16 for navbar spacing */}
         {problem ? (
           <div>
             <div className="p-4 mb-4 bg-gray-700 rounded-xl shadow-lg">
@@ -374,7 +354,9 @@ class Solution {
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+          <div className="flex flex-col items-center justify-center h-full text-center p-8 mt-16">
+            {" "}
+            {/* Adjust mt-16 for navbar spacing */}
             <h1 className="text-4xl font-bold text-gray-200 mb-4">
               IntelliHint
             </h1>
@@ -403,7 +385,7 @@ class Solution {
           <button
             type="submit"
             disabled={loading}
-            className="absolute right-3 bottom-3 p-2 bg-blue-600 text-white rounded-lg transition-colors hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed"
+            className="absolute right-3 bottom-2 p-2 bg-blue-600 text-white rounded-lg transition-colors hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
