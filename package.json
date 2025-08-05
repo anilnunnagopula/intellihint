@@ -1,0 +1,17 @@
+{
+  "name": "intellihint",
+  "version": "1.0.0",
+  "description": "A next-gen AI-powered learning assistant for coders.",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start --prefix client\" \"npm run start --prefix server\"",
+    "start:server": "npm run dev --prefix server",
+    "start:client": "npm start --prefix client"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
