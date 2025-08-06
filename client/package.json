@@ -18,7 +18,7 @@
     "@codemirror/view": "^6.38.1",
     "@uiw/react-codemirror": "^4.24.2",
     "axios": "^1.6.8",
-    "framer-motion": "^11.2.6",
+    "framer-motion": "^7.6.0",
     "react": "^18.2.0",
     "react-codemirror2": "^8.0.1",
     "react-dom": "^18.2.0",
