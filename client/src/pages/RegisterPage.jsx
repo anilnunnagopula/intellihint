@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -12,6 +12,59 @@ function RegisterPage() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
+  // Ref for the Google Sign-Up button container
+  const googleSignUpButtonRef = useRef(null);
+
+  // Function to handle Google credential response
+  const handleCredentialResponse = async (response) => {
+    setLoading(true);
+    try {
+      // Send the ID token to your backend
+      const res = await api.post("/auth/google", {
+        idToken: response.credential,
+      });
+      login(res.data.token, res.data.username);
+      toast.success("Google registration successful! Redirecting...");
+      navigate("/");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Google registration failed.");
+      console.error("Google registration error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Load Google Identity Services script
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      // Initialize Google Identity Services
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // Use Vite's way to access env vars
+          callback: handleCredentialResponse,
+        });
+
+        // Render the Google Sign-Up button
+        if (googleSignUpButtonRef.current) {
+          window.google.accounts.id.renderButton(
+            googleSignUpButtonRef.current,
+            { theme: "outline", size: "large", text: "signup_with" } // Removed width: '100%'
+          );
+        }
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Clean up the script when component unmounts
+      document.body.removeChild(script);
+    };
+  }, []); // Empty dependency array means this runs once on mount
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -24,19 +77,12 @@ function RegisterPage() {
       });
       login(res.data.token, res.data.username);
       toast.success("Registration successful! Redirecting...");
-      navigate("/"); // Navigate to home/dashboard after login
+      navigate("/");
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGoogleSignUp = () => {
-    // This is a placeholder for Google Sign-Up.
-    // In a real application, you would initiate Google OAuth flow here.
-    toast("Google Sign-Up initiated (placeholder)!", { icon: "🚀" });
-    console.log("Initiating Google Sign-Up...");
   };
 
   return (
@@ -58,7 +104,7 @@ function RegisterPage() {
             </label>
             <input
               type="text"
-              id="username" // Added id
+              id="username"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -75,7 +121,7 @@ function RegisterPage() {
             </label>
             <input
               type="email"
-              id="email" // Added id
+              id="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -92,7 +138,7 @@ function RegisterPage() {
             </label>
             <input
               type="password"
-              id="password" // Added id
+              id="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -119,22 +165,11 @@ function RegisterPage() {
           <div className="flex-grow border-t border-gray-700"></div>
         </div>
 
-        <button
-          onClick={handleGoogleSignUp}
-          disabled={loading}
-          className={`w-full flex items-center justify-center py-2 px-4 font-bold rounded-md transition-colors border border-gray-600 ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-gray-700 hover:bg-gray-600 text-white"
-          }`}
-        >
-          <img
-            src="https://www.svgrepo.com/show/353597/google.svg"
-            alt="Google logo"
-            className="w-5 h-5 mr-2"
-          />
-          Sign up with Google
-        </button>
+        {/* Google Sign-Up button container - apply w-full here */}
+        <div
+          ref={googleSignUpButtonRef}
+          className="w-full flex justify-center"
+        ></div>
 
         <div className="text-center text-sm text-gray-400 mt-4">
           Already have an account?{" "}

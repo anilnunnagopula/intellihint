@@ -361,7 +361,7 @@ function Home() {
               IntelliHint
             </h1>
             <p className="text-gray-400 max-w-lg">
-              👋 Yo, drop your DSA problem below — I’ll break it down
+              Hii, drop your DSA problem below — I’ll break it down
               step-by-step 💡.
             </p>
           </div>
